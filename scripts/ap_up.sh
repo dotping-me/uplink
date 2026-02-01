@@ -74,6 +74,7 @@ fi
 
 # Creates the virtual access point and its config
 sudo iw dev "$UPLINK" interface add "$UPLINK"_ap type __ap
+sudo nmcli dev set "$VAP_NAME" managed no
 
 # Creates hostapd config
 TEMP_DIR="$DIR/../temp"
@@ -92,7 +93,7 @@ wpa_key_mgmt=WPA-PSK
 rsn_pairwise=CCMP
 EOF
 
-chmod 600 "$CONF"
+sudo chmod 600 "$CONF"
 
 # Assign IP address to Virtual AP and enables it
 sudo ip addr flush dev "$VAP_NAME" || true # Flushes first for sanity

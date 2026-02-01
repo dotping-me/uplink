@@ -8,7 +8,7 @@
 
 # Stop services
 sudo pkill dnsmasq
-sudo systemctl stop hostapd
+sudo killall -9 hostapd
 
 # Disable forwarding
 sudo sysctl -w net.ipv4.ip_forward=0
