@@ -72,11 +72,22 @@ if iw dev "$VAP_NAME" info &>/dev/null; then
     sudo iw dev "$VAP_NAME" del
 fi 
 
+# Step 1
 # Creates the virtual access point and its config
 sudo iw dev "$UPLINK" interface add "$UPLINK"_ap type __ap
 sudo nmcli dev set "$VAP_NAME" managed no
 
+# Step 2
+# Assign IP address to Virtual AP and enables it
+sudo ip addr flush dev "$VAP_NAME" || true # Flushes first for sanity
+sudo ip addr add 192.168.50.1/24 dev "$VAP_NAME"
+
+# Step 3
+# Starts hostapd in background
+# NOTE: hostapd takes care of bringing the interface up
+#       so no need to do `sudo ip link set "$VAP_NAME" up`
 # Creates hostapd config
+
 TEMP_DIR="$DIR/../temp"
 mkdir -p "$TEMP_DIR"
 
@@ -94,17 +105,9 @@ rsn_pairwise=CCMP
 EOF
 
 sudo chmod 600 "$CONF"
-
-# Assign IP address to Virtual AP and enables it
-sudo ip addr flush dev "$VAP_NAME" || true # Flushes first for sanity
-sudo ip addr add 192.168.50.1/24 dev "$VAP_NAME"
-
-# Starts hostapd in background
-# NOTE: hostapd takes care of bringing the interface up
-#       so no need to do `sudo ip link set "$VAP_NAME" up`
-
 sudo hostapd "$CONF" &
 
+# Step 4
 # Starts DHCP Server in background (Assigns an IP to connected devices)
 sudo dnsmasq \
     --interface="$VAP_NAME" \

@@ -19,4 +19,5 @@ sudo iptables -t nat -F
 
 # Remove AP interface
 sudo ip link set wlan0_ap down
+sudo ip addr flush dev wlan0_ap
 sudo iw dev wlan0_ap del
